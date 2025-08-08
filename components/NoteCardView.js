@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEnhancedStore } from "@/lib/hooks/useEnhancedStore";
 import ActionMenu from "./ActionMenu";

@@ -41,13 +41,6 @@ export default function TopBar() {
       >
         <AddNoteCardButton />
       </motion.div>
-      {/* <motion.button
-        className="p-2 rounded-xl hover:bg-[var(--gray)] transition-colors"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <MagnifyingGlassIcon className="w-6 h-6" />
-      </motion.button> */}
     </motion.div>
   );
 }

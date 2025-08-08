@@ -10,7 +10,6 @@ export default function NoteItem({
   onLongPress,
   isSelected,
   showSelection,
-  totalItems,
   isReminder = false,
   cardId,
   isKeep = false,

@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { useEnhancedStore } from "@/lib/hooks/useEnhancedStore";
 import { truncateText } from "@/lib/utils";
-import { CrumpledPaperIcon } from "@radix-ui/react-icons";
 import { AiOutlineBulb } from "react-icons/ai";
 
 export default function KeepCard() {

@@ -94,11 +94,6 @@ export default function ActionMenu() {
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
       >
         <div className="max-w-md mx-auto">
-          {/* <p className="text-center text-sm text-gray-600  ">
-            {selectedItems.length} {isSelectingNoteCards ? "card" : "item"}
-            {selectedItems.length !== 1 ? "s" : ""} selected
-          </p> */}
-
           <div className="flex justify-around">
             {actions.map((action, index) => (
               <motion.button

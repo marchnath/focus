@@ -2,10 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
-import { formatDate, getUpcomingReminder } from "@/lib/utils";
+import { getUpcomingReminder } from "@/lib/utils";
 import { useState } from "react";
 import {
-  ClockIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   DrawingPinIcon,
@@ -66,9 +65,6 @@ export default function BriefingCard() {
         <DrawingPinIcon className="w-4 h-4 text-gray-400 " />
       </div>
       <div className="flex items-center justify-between mb-3">
-        {/* <h3 className="font-semibold text-gray-900 ">
-          Today's Briefing
-        </h3> */}
         {shouldShowExpansion && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {isExpanded ? (

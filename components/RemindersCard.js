@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useEnhancedStore } from "@/lib/hooks/useEnhancedStore";
 import { formatDate } from "@/lib/utils";
-import { ClockIcon, BellIcon } from "@radix-ui/react-icons";
+import { ClockIcon } from "@radix-ui/react-icons";
 
 export default function RemindersCard() {
   const { reminders, setActiveNoteCard } = useEnhancedStore();

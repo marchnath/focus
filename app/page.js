@@ -7,7 +7,7 @@ import { useDataSync } from "@/lib/hooks/useDataSync";
 import DataSyncProvider from "@/components/DataSyncProvider";
 import TopBar from "@/components/TopBar";
 import MenuSlider from "@/components/MenuSlider";
-import WelcomeMessage from "@/components/WelcomeMessage";
+
 import TodoCard from "@/components/TodoCard";
 import GoalsCard from "@/components/GoalsCard";
 import RemindersCard from "@/components/RemindersCard";
