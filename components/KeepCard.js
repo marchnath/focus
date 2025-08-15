@@ -10,6 +10,7 @@ export default function KeepCard() {
 
   const activeItems = keepItems.filter((item) => !item.archived);
   const previewItems = activeItems.slice(-3);
+  const itemCount = activeItems.length;
 
   const handleCardClick = () => {
     // Always open keep view directly
@@ -21,10 +22,20 @@ export default function KeepCard() {
     setActiveNoteCard(keepCardData);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCardClick();
+    }
+  };
+
   return (
     <motion.div
       onClick={handleCardClick}
-      className={`bg-white  rounded-2xl border cursor-pointer hover:shadow-md transition-all overflow-hidden h-full flex flex-col border-[var(--gray)] relative`}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      className={`group relative h-full flex flex-col overflow-hidden cursor-pointer rounded-2xl border transition-all select-none outline-none bg-gradient-to-br from-white to-gray-50 border-[var(--gray)] hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
@@ -32,7 +43,7 @@ export default function KeepCard() {
       whileTap={{ scale: 0.98 }}
     >
       {/* Idea Icon */}
-      <div className="absolute top-3 right-3">
+      <div className="absolute top-2 right-2">
         <AiOutlineBulb className="w-4 h-4 text-gray-400 " />
       </div>
 
@@ -45,12 +56,13 @@ export default function KeepCard() {
             {previewItems.map((item, itemIndex) => (
               <motion.div
                 key={item.id}
-                className="text-sm text-gray-700 "
+                className="text-sm text-gray-800 flex items-start gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: itemIndex * 0.05 }}
               >
-                {truncateText(item.text, 60)}
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-300 flex-shrink-0" />
+                <span className="truncate">{truncateText(item.text, 60)}</span>
               </motion.div>
             ))}
           </div>
@@ -58,8 +70,11 @@ export default function KeepCard() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[var(--gray)] bg-gray-100  px-4 py-3 flex-shrink-0">
-        <h3 className="font-medium text-gray-900 ">Keep</h3>
+      <div className="border-t border-[var(--gray)] bg-gradient-to-r from-gray-50 to-gray-100/80 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+        <h3 className="font-medium text-gray-900 truncate">Keep</h3>
+        <span className="text-xs text-gray-500 whitespace-nowrap">
+          {itemCount} {itemCount === 1 ? "item" : "items"}
+        </span>
       </div>
     </motion.div>
   );

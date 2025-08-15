@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEnhancedStore } from "@/lib/hooks/useEnhancedStore";
 import ActionMenu from "./ActionMenu";
@@ -50,16 +50,9 @@ export default function NoteCardView() {
     goals,
   } = useEnhancedStore();
 
-  const [inputValue, setInputValue] = useState("");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
-
-  const handleInputKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAddItem(e);
-    }
-  };
+  const [isAddingNewItem, setIsAddingNewItem] = useState(false);
 
   // Handle background clicks to close action menu
   const handleBackgroundClick = () => {
@@ -74,6 +67,9 @@ export default function NoteCardView() {
       // Auto-focus title if it's empty (new card)
       if (!activeNoteCard.name) {
         setIsEditingTitle(true);
+      } else {
+        // Auto-activate new item input when opening a note
+        setIsAddingNewItem(true);
       }
     }
   }, [activeNoteCard]);
@@ -99,34 +95,37 @@ export default function NoteCardView() {
     activeItems = activeNoteCard.items.filter((item) => !item.archived);
   }
 
-  const handleAddItem = async (e) => {
-    e.preventDefault();
-    if (inputValue.trim()) {
+  const handleAddItem = async (text) => {
+    if (text.trim()) {
       if (isKeepCard) {
-        await addKeepItem(inputValue.trim());
+        await addKeepItem(text.trim());
       } else if (isRemindersCard) {
         // Use smart reminder parsing for reminders
-        const parsed = parseSmartReminder(inputValue.trim());
+        const parsed = parseSmartReminder(text.trim());
         await addReminder({
           text: parsed.text,
           date: parsed.date,
           time: parsed.time,
         });
       } else if (isTodosCard) {
-        await addTodo(inputValue.trim());
+        await addTodo(text.trim());
       } else if (isGoalsCard) {
-        await addGoal(inputValue.trim());
+        await addGoal(text.trim());
       } else {
-        await addNoteItem(activeNoteCard.id, inputValue.trim());
+        await addNoteItem(activeNoteCard.id, text.trim());
       }
-      setInputValue("");
-
-      // Reset textarea height after clearing input
-      const textarea = document.querySelector("textarea");
-      if (textarea) {
-        textarea.style.height = "48px";
-      }
+      setIsAddingNewItem(false);
     }
+  };
+
+  const handleStartNewItem = () => {
+    if (!isAddingNewItem) {
+      setIsAddingNewItem(true);
+    }
+  };
+
+  const handleCancelNewItem = () => {
+    setIsAddingNewItem(false);
   };
 
   const handleTitleSave = async () => {
@@ -159,7 +158,7 @@ export default function NoteCardView() {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 bg-gray-200  z-50 flex flex-col"
+        className="fixed inset-0 z-50 flex flex-col bg-white pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]"
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
@@ -168,136 +167,207 @@ export default function NoteCardView() {
       >
         {/* Header */}
         <div
-          className="flex items-center justify-between p-2"
+          className="sticky top-0 z-10 backdrop-blur supports-[backdrop-filter]:bg-gray-100/70 bg-gray-100/90 border-b border-gray-100"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            onClick={() => {
-              closeActionMenu();
-              clearActiveNoteCard();
-            }}
-            className="p-2 rounded-xl hover:bg-[var(--gray)] transition-colors"
-          >
-            <ArrowLeftIcon className="w-5 h-5" />
-          </button>
-
-          {isEditingTitle && !isKeepCard && !isRemindersCard ? (
-            <input
-              type="text"
-              value={titleValue}
-              onChange={(e) => setTitleValue(e.target.value)}
-              onBlur={handleTitleSave}
-              onKeyDown={handleTitleKeyDown}
-              className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none text-center"
-              placeholder="Enter card name"
-              autoFocus
-            />
-          ) : (
-            <h1
-              className={`text-lg font-semibold text-gray-900  transition-colors ${
-                !isKeepCard && !isRemindersCard
-                  ? "cursor-pointer hover:text-[var(--primary)]"
-                  : ""
-              }`}
+          <div className="mx-auto max-w-2xl px-2 py-2 flex items-center justify-between">
+            <button
               onClick={() => {
-                if (!isKeepCard && !isRemindersCard) {
-                  setIsEditingTitle(true);
-                }
+                closeActionMenu();
+                clearActiveNoteCard();
               }}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              aria-label="Back"
             >
-              {titleValue || "Untitled"}
-            </h1>
-          )}
+              <ArrowLeftIcon className="w-5 h-5" />
+            </button>
 
-          <button className="p-2 rounded-xl hover:bg-[var(--gray)] transition-colors">
-            <DotsHorizontalIcon className="w-5 h-5" />
-          </button>
+            {isEditingTitle && !isKeepCard && !isRemindersCard ? (
+              <input
+                type="text"
+                value={titleValue}
+                onChange={(e) => setTitleValue(e.target.value)}
+                onBlur={handleTitleSave}
+                onKeyDown={handleTitleKeyDown}
+                className="text-base font-medium text-gray-900 bg-transparent border-b border-gray-300 focus:border-[var(--primary)] outline-none text-center px-2 py-0.5 rounded"
+                placeholder="Enter card name"
+                autoFocus
+              />
+            ) : (
+              <h1
+                className={`text-base font-medium text-gray-900 transition-colors ${
+                  !isKeepCard && !isRemindersCard
+                    ? "cursor-pointer hover:text-[var(--primary)]"
+                    : ""
+                }`}
+                onClick={() => {
+                  if (!isKeepCard && !isRemindersCard) {
+                    setIsEditingTitle(true);
+                  }
+                }}
+              >
+                {titleValue || "Untitled"}
+              </h1>
+            )}
+
+            <button
+              className="p-2 rounded-xl hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+              aria-label="More options"
+            >
+              <DotsHorizontalIcon className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Content */}
         <div
-          className="flex-1 overflow-y-auto scrollbar-hide bg-white m-2 rounded-2xl py-4 pb-24"
+          className="flex-1 overflow-y-auto scrollbar-hide bg-white"
           onClick={(e) => e.stopPropagation()}
         >
-          {activeItems.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
-              <p>No items yet</p>
-              <p className="text-sm">Add your first item below</p>
-            </div>
-          ) : (
-            <div className="space-y-0">
-              {activeItems.map((item, index) => (
-                <NoteItem
-                  key={item.id}
-                  item={item}
-                  index={index}
-                  onLongPress={handleLongPress}
-                  isSelected={selectedItems.includes(item.id)}
-                  showSelection={isActionMenuOpen}
-                  totalItems={activeItems.length}
-                  isReminder={isRemindersCard}
-                  isKeep={isKeepCard}
-                  isTodo={isTodosCard}
-                  isGoal={isGoalsCard}
-                  cardId={
-                    !isKeepCard &&
-                    !isRemindersCard &&
-                    !isTodosCard &&
-                    !isGoalsCard
-                      ? activeNoteCard.id
-                      : null
-                  }
-                />
-              ))}
-            </div>
-          )}
+          <div className="min-h-full">
+            {activeItems.length === 0 && !isAddingNewItem ? (
+              <div className="text-center text-gray-500 py-16 px-4">
+                <p className="font-medium">No items yet</p>
+                <p className="text-sm mt-1">
+                  Start typing below to add your first item
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {/* Existing items */}
+                {activeItems.map((item, index) => (
+                  <NoteItem
+                    key={item.id}
+                    item={item}
+                    index={index}
+                    onLongPress={handleLongPress}
+                    isSelected={selectedItems.includes(item.id)}
+                    showSelection={isActionMenuOpen}
+                    totalItems={activeItems.length}
+                    isReminder={isRemindersCard}
+                    isKeep={isKeepCard}
+                    isTodo={isTodosCard}
+                    isGoal={isGoalsCard}
+                    cardId={
+                      !isKeepCard &&
+                      !isRemindersCard &&
+                      !isTodosCard &&
+                      !isGoalsCard
+                        ? activeNoteCard.id
+                        : null
+                    }
+                  />
+                ))}
+
+                {/* New item being added at the bottom */}
+                {isAddingNewItem && (
+                  <NewItemEditor
+                    onSave={handleAddItem}
+                    onCancel={handleCancelNewItem}
+                    placeholder={
+                      isRemindersCard
+                        ? "e.g Chemistry test tomorrow at 2pm"
+                        : "Type your item here..."
+                    }
+                    index={activeItems.length}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Input Field */}
+        {/* Floating Add Button - Always visible */}
         {!isActionMenuOpen && (
-          <div
-            className="p-2 border-t border-[var(--gray)]    "
-            onClick={(e) => e.stopPropagation()}
+          <motion.button
+            onClick={handleStartNewItem}
+            className="fixed bottom-8 right-8 w-14 h-14 bg-[var(--primary)] rounded-full flex items-center justify-center text-white shadow-[0_10px_20px_-5px_rgba(0,0,0,0.25)] ring-4 ring-[var(--primary)]/20"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            aria-label="Add item"
           >
-            <form onSubmit={handleAddItem} className="flex items-end space-x-3">
-              <textarea
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleInputKeyDown}
-                placeholder={
-                  isRemindersCard
-                    ? "e.g Chemistry test tomorrow at 2pm"
-                    : "Add new item..."
-                }
-                className="flex-1 p-3  bg-white  rounded-3xl border border-[var(--gray)]  focus:outline-none text-gray-900  placeholder-gray-500 resize-none overflow-y-auto min-h-[48px] max-h-[144px] scrollbar-hide"
-                rows={1}
-                style={{
-                  height: "auto",
-                  minHeight: "48px",
-                  maxHeight: "144px",
-                }}
-                onInput={(e) => {
-                  e.target.style.height = "auto";
-                  e.target.style.height =
-                    Math.min(e.target.scrollHeight, 144) + "px";
-                }}
-              />
-              <motion.button
-                type="submit"
-                className="w-12 h-12 bg-[var(--primary)] rounded-full flex items-center justify-center text-white"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={!inputValue.trim()}
-              >
-                <PlusIcon className="w-5 h-5" />
-              </motion.button>
-            </form>
-          </div>
+            <PlusIcon className="w-6 h-6" />
+          </motion.button>
         )}
 
         {/* Action Menu */}
         <ActionMenu />
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+// Component for editing new items inline
+function NewItemEditor({ onSave, onCancel, placeholder, index }) {
+  const [text, setText] = useState("");
+  const textareaRef = useRef();
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+      // Scroll to bottom to show the new item input
+      setTimeout(() => {
+        textareaRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "end",
+          inline: "nearest",
+        });
+      }, 100);
+    }
+  }, []);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (text.trim()) {
+        onSave(text);
+        setText("");
+      }
+    } else if (e.key === "Escape") {
+      onCancel();
+    }
+  };
+
+  const handleSave = () => {
+    if (text.trim()) {
+      onSave(text);
+      setText("");
+    } else {
+      onCancel();
+    }
+  };
+
+  const handleInput = (e) => {
+    e.target.style.height = "auto";
+    e.target.style.height = e.target.scrollHeight + "px";
+  };
+
+  return (
+    <motion.div
+      className="relative transition-colors bg-white"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
+    >
+      <div className="flex items-start text-gray-900 p-3">
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={handleSave}
+          onInput={handleInput}
+          placeholder={placeholder}
+          className="w-full bg-transparent border-none outline-none text-gray-900 placeholder-gray-400 resize-none overflow-hidden p-0"
+          style={{
+            height: "auto",
+            minHeight: "20px",
+          }}
+        />
+      </div>
+    </motion.div>
   );
 }

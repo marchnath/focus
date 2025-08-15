@@ -18,6 +18,7 @@ export default function NoteCard({ card, index }) {
   const previewItems = activeItems.slice(-3);
   const longPressTimer = useRef();
   const isSelected = selectedItems.includes(card.id);
+  const itemCount = activeItems.length;
 
   const handleCardClick = () => {
     if (isActionMenuOpen) {
@@ -51,15 +52,29 @@ export default function NoteCard({ card, index }) {
     }
   };
 
+  const handleKeyDown = (e) => {
+    // Accessible interactions for keyboard users
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleCardClick();
+    }
+  };
+
   return (
     <motion.div
       onClick={handleCardClick}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
-      className={`bg-white  rounded-2xl border cursor-pointer hover:shadow-md transition-all overflow-hidden relative h-full flex flex-col ${
-        isSelected ? "border-orange-500 bg-orange-50 " : "border-[var(--gray)]"
-      }`}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-selected={isSelected}
+      className={`group relative h-full flex flex-col overflow-hidden cursor-pointer rounded-2xl border transition-all select-none outline-none bg-gradient-to-br from-white to-gray-50 ${
+        isSelected
+          ? "ring-2 ring-orange-400/60 ring-offset-1 ring-offset-orange-50 border-orange-300 bg-orange-50"
+          : "border-[var(--gray)]"
+      }  hover:shadow-lg focus-visible:ring-2 focus-visible:ring-orange-500`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -69,18 +84,32 @@ export default function NoteCard({ card, index }) {
       {isActionMenuOpen && (
         <div className="absolute top-2 right-2 z-10">
           <div
-            className={`w-5 h-5 rounded-full border-2 ${
-              isSelected ? "bg-orange-500 border-orange-500" : "border-gray-300"
+            className={`h-6 w-6 rounded-full border-2 flex items-center justify-center shadow-sm transition-colors ${
+              isSelected
+                ? "bg-orange-500 border-orange-500"
+                : "bg-white/70 backdrop-blur border-gray-300"
             }`}
           >
-            {isSelected && (
-              <motion.div
-                className="w-full h-full rounded-full bg-orange-500 flex items-center justify-center"
+            {isSelected ? (
+              <motion.svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="none"
+                className="h-3.5 w-3.5 text-white"
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
               >
-                <div className="w-2 h-2 bg-white rounded-full" />
-              </motion.div>
+                <path
+                  d="M5 10.5l3 3 7-7"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </motion.svg>
+            ) : (
+              <span className="block h-1.5 w-1.5 rounded-full bg-gray-300" />
             )}
           </div>
         </div>
@@ -89,22 +118,46 @@ export default function NoteCard({ card, index }) {
       {/* Content */}
       <div
         className={`p-4 flex-1 overflow-hidden ${
-          isActionMenuOpen ? "pr-8" : ""
+          isActionMenuOpen ? "pr-10" : ""
         }`}
       >
         {previewItems.length === 0 ? (
-          <p className="text-gray-500 text-sm">No items yet</p>
+          <div className="text-gray-500 text-sm flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="h-4 w-4 text-gray-400"
+            >
+              <path
+                d="M5 7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V7z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M8 9h8M8 12h5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <p>No items yet</p>
+          </div>
         ) : (
           <div className="space-y-2 h-full">
             {previewItems.map((item, itemIndex) => (
               <motion.div
                 key={item.id}
-                className="text-sm text-gray-700 "
+                className="text-sm text-gray-800 flex items-start gap-2"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: itemIndex * 0.05 }}
               >
-                {truncateText(item.text, 60)}
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-300 flex-shrink-0" />
+                <span className="truncate">{truncateText(item.text, 60)}</span>
               </motion.div>
             ))}
           </div>
@@ -112,10 +165,13 @@ export default function NoteCard({ card, index }) {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-[var(--gray)] bg-gray-100 px-4 py-3 flex-shrink-0">
-        <h3 className="font-medium text-gray-900 ">
+      <div className="border-t border-[var(--gray)] bg-gradient-to-r from-gray-50 to-gray-100/80 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+        <h3 className="font-medium text-gray-900 truncate">
           {card.name || "Untitled"}
         </h3>
+        <span className="text-xs text-gray-500 whitespace-nowrap">
+          {itemCount} {itemCount === 1 ? "item" : "items"}
+        </span>
       </div>
     </motion.div>
   );

@@ -124,13 +124,9 @@ export default function NoteItem({
 
   return (
     <motion.div
-      className={`relative transition-colors select-none ${
-        isSelected
-          ? "bg-orange-50 "
-          : index % 2 === 0
-          ? "bg-white "
-          : "bg-gray-50 "
-      } ${showSelection ? "cursor-pointer" : "cursor-text"}`}
+      className={`relative select-none transition-colors p-1 ${
+        showSelection ? "cursor-pointer" : "cursor-text"
+      } ${isSelected ? "bg-amber-50" : "bg-white hover:bg-gray-50/70"}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
@@ -142,12 +138,12 @@ export default function NoteItem({
       onClick={handleClick}
     >
       {showSelection && (
-        <div className="absolute top-2 right-6">
+        <div className="absolute top-3 right-4">
           <div
-            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${
               isSelected
-                ? "bg-gray-800 border-gray-800"
-                : "border-gray-300 bg-white "
+                ? "bg-[var(--primary)] border-[var(--primary)]"
+                : "border-gray-300 bg-white"
             }`}
           >
             {isSelected && (
@@ -164,7 +160,7 @@ export default function NoteItem({
 
       {isReminder ? (
         <div
-          className={`flex items-start justify-between p-4 ${
+          className={`flex items-start justify-between p-3 ${
             showSelection ? "pr-12" : ""
           }`}
         >
@@ -176,7 +172,7 @@ export default function NoteItem({
                 onChange={(e) => setEditText(e.target.value)}
                 onBlur={handleSaveEdit}
                 onKeyDown={handleKeyDown}
-                className="w-full bg-transparent border-none outline-none text-gray-900  mb-1 resize-none overflow-hidden"
+                className="w-full bg-transparent border-none outline-none text-gray-900 mb-1 resize-none overflow-hidden p-0"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   height: "auto",
@@ -188,7 +184,7 @@ export default function NoteItem({
                 }}
               />
             ) : (
-              <p className="text-gray-900  mb-1 cursor-text break-words whitespace-pre-wrap">
+              <p className="text-gray-900 mb-1 cursor-text break-words whitespace-pre-wrap">
                 {item.text}
               </p>
             )}
@@ -200,12 +196,12 @@ export default function NoteItem({
           </div>
         </div>
       ) : isTodo ? (
-        <div className={`flex items-start p-4 ${showSelection ? "pr-12" : ""}`}>
+        <div className={`flex items-start p-3 ${showSelection ? "pr-12" : ""}`}>
           <div
-            className={`w-4 h-4 rounded border-2 mr-3 mt-0.5 flex items-center justify-center cursor-pointer ${
+            className={`w-4 h-4 rounded-md border-2 mr-3 mt-0.5 flex items-center justify-center cursor-pointer transition-colors ${
               item.completed
-                ? "bg-green-500 border-green-500"
-                : "border-gray-300"
+                ? "bg-[var(--primary)] border-[var(--primary)]"
+                : "border-gray-300 hover:border-[var(--primary)]"
             }`}
             onClick={(e) => {
               e.stopPropagation();
@@ -234,7 +230,7 @@ export default function NoteItem({
                 onChange={(e) => setEditText(e.target.value)}
                 onBlur={handleSaveEdit}
                 onKeyDown={handleKeyDown}
-                className="w-full bg-transparent border-none outline-none text-gray-900  resize-none overflow-hidden"
+                className="w-full bg-transparent border-none outline-none text-gray-900 resize-none overflow-hidden p-0"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   height: "auto",
@@ -259,10 +255,12 @@ export default function NoteItem({
           </div>
         </div>
       ) : isGoal ? (
-        <div className={`flex items-start p-4 ${showSelection ? "pr-12" : ""}`}>
+        <div className={`flex items-start p-3 ${showSelection ? "pr-12" : ""}`}>
           <div
-            className={`w-4 h-4 rounded-full border-2 mr-3 mt-0.5 flex items-center justify-center cursor-pointer ${
-              item.completed ? "bg-gray-800 border-gray-800" : "border-gray-300"
+            className={`w-4 h-4 rounded-full border-2 mr-3 mt-0.5 flex items-center justify-center cursor-pointer transition-colors ${
+              item.completed
+                ? "bg-[var(--primary)] border-[var(--primary)]"
+                : "border-gray-300 hover:border-[var(--primary)]"
             }`}
             onClick={(e) => {
               e.stopPropagation();
@@ -291,7 +289,7 @@ export default function NoteItem({
                 onChange={(e) => setEditText(e.target.value)}
                 onBlur={handleSaveEdit}
                 onKeyDown={handleKeyDown}
-                className="w-full bg-transparent border-none outline-none text-gray-900  resize-none overflow-hidden"
+                className="w-full bg-transparent border-none outline-none text-gray-900 resize-none overflow-hidden p-0"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   height: "auto",
@@ -324,7 +322,7 @@ export default function NoteItem({
         </div>
       ) : (
         <div
-          className={`flex items-start text-gray-900 p-4 ${
+          className={`flex items-start text-gray-900 p-3 ${
             showSelection ? "pr-12" : ""
           }`}
         >
@@ -335,7 +333,7 @@ export default function NoteItem({
               onChange={(e) => setEditText(e.target.value)}
               onBlur={handleSaveEdit}
               onKeyDown={handleKeyDown}
-              className="w-full bg-transparent border-none outline-none text-gray-900  resize-none overflow-hidden"
+              className="w-full bg-transparent border-none outline-none text-gray-900 resize-none overflow-hidden p-0"
               onClick={(e) => e.stopPropagation()}
               style={{
                 height: "auto",

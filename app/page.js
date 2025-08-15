@@ -40,6 +40,17 @@ export default function Home() {
     }
   }, [isDarkMode]);
 
+  // Close menu on Escape for quick keyboard dismissal
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape" && isActionMenuOpen) {
+        closeActionMenu();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isActionMenuOpen, closeActionMenu]);
+
   // Show loading screen while authentication is being checked
   if (loading) {
     return <AuthLoading />;
@@ -53,59 +64,103 @@ export default function Home() {
     }
   };
 
+  // Tiny date label for subtle header
+  const today = new Date();
+  const dateLabel = new Intl.DateTimeFormat(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  }).format(today);
+
+  // Animation variants for a gentle stagger
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: { staggerChildren: 0.06, delayChildren: 0.02 },
+    },
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 8 },
+    show: { opacity: 1, y: 0 },
+  };
+
   return (
     <DataSyncProvider>
       <div
-        className="min-h-screen bg-[var(--bg)] pb-32"
+        className="relative min-h-screen bg-[var(--bg)] pb-32 overflow-hidden"
         onClick={handleBackgroundClick}
       >
         <TopBar />
         <MenuSlider />
 
-        <main className="px-4 py-2">
-          {/* Simple Grid Layout */}
-          <div className="max-w-md mx-auto space-y-4">
-            {/* Welcome Message */}
-            {/* <div onClick={(e) => e.stopPropagation()}>
-            <WelcomeMessage />
-          </div> */}
+        <main className="px-3 sm:px-4 py-3">
+          <div className="max-w-xl sm:max-w-2xl mx-auto space-y-4">
+            {/* Subtle page header */}
+            <div className="px-1" onClick={(e) => e.stopPropagation()}>
+              <p className="text-[11px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                {dateLabel}
+              </p>
+              <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+                Your Focus
+              </h1>
+            </div>
 
-            {/* Main Grid Layout with 4 permanent cards */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* Main Grid Layout with 4 permanent cards + dynamic notes */}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-2 gap-4 sm:gap-5"
+            >
               {/* Todo Card */}
-              <div onClick={(e) => e.stopPropagation()} className="h-[180px]">
+              <motion.div
+                variants={itemVariants}
+                onClick={(e) => e.stopPropagation()}
+                className="h-[180px]"
+              >
                 <TodoCard />
-              </div>
+              </motion.div>
 
               {/* Goals Card */}
-              <div onClick={(e) => e.stopPropagation()} className="h-[180px]">
+              <motion.div
+                variants={itemVariants}
+                onClick={(e) => e.stopPropagation()}
+                className="h-[180px]"
+              >
                 <GoalsCard />
-              </div>
+              </motion.div>
 
               {/* Reminders Card */}
-              <div onClick={(e) => e.stopPropagation()} className="h-[180px]">
+              <motion.div
+                variants={itemVariants}
+                onClick={(e) => e.stopPropagation()}
+                className="h-[180px]"
+              >
                 <RemindersCard />
-              </div>
+              </motion.div>
 
               {/* Keep Card */}
-              <div onClick={(e) => e.stopPropagation()} className="h-[180px]">
+              <motion.div
+                variants={itemVariants}
+                onClick={(e) => e.stopPropagation()}
+                className="h-[180px]"
+              >
                 <KeepCard />
-              </div>
+              </motion.div>
 
               {/* Note Cards */}
               {noteCards.map((card, index) => (
                 <motion.div
                   key={card.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: (index + 4) * 0.1 }}
+                  variants={itemVariants}
                   className="w-full h-[180px]"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <NoteCard card={card} index={index + 4} />
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </main>
 
