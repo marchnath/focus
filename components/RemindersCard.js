@@ -56,7 +56,7 @@ export default function RemindersCard() {
         {reminders.length === 0 ? (
           <p className="text-gray-500 text-sm">No reminders</p>
         ) : (
-          <div className="space-y-3 h-full">
+          <div className="h-full divide-y divide-gray-200/70">
             {reminders.slice(-3).map((reminder, index) => (
               <motion.div
                 key={reminder.id}
@@ -64,10 +64,10 @@ export default function RemindersCard() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.08 }}
                 onClick={(e) => e.stopPropagation()}
-                className="text-sm text-gray-800"
+                className="text-sm text-gray-800 py-1.5"
               >
-                <p className="mb-1 truncate">{reminder.text}</p>
-                <div className="flex items-center gap-1 text-xs text-gray-500">
+                <p className="truncate">{reminder.text}</p>
+                <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
                   <span>
                     {formatDate(reminder.date)} at {reminder.time}
                   </span>

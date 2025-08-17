@@ -147,17 +147,18 @@ export default function NoteCard({ card, index }) {
             <p>No items yet</p>
           </div>
         ) : (
-          <div className="space-y-2 h-full">
+          <div className="h-full divide-y divide-gray-200/70">
             {previewItems.map((item, itemIndex) => (
               <motion.div
                 key={item.id}
-                className="text-sm text-gray-800 flex items-start gap-2"
+                className="text-sm text-gray-800 py-1.5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: itemIndex * 0.05 }}
               >
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-gray-300 flex-shrink-0" />
-                <span className="truncate">{truncateText(item.text, 60)}</span>
+                <span className="block truncate">
+                  {truncateText(item.text, 60)}
+                </span>
               </motion.div>
             ))}
           </div>

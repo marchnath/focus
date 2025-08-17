@@ -49,11 +49,11 @@ export default function GoalsCard() {
         {previewGoals.length === 0 ? (
           <p className="text-gray-500 text-sm">No goals set</p>
         ) : (
-          <div className="space-y-2 h-full">
+          <div className="h-full divide-y divide-gray-200/70">
             {previewGoals.map((goal, goalIndex) => (
               <motion.div
                 key={goal.id}
-                className="text-sm text-gray-800"
+                className="text-sm text-gray-800 py-1.5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: goalIndex * 0.08 }}

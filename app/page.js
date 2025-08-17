@@ -98,10 +98,10 @@ export default function Home() {
           <div className="max-w-xl sm:max-w-2xl mx-auto space-y-4">
             {/* Subtle page header */}
             <div className="px-1" onClick={(e) => e.stopPropagation()}>
-              <p className="text-[11px] uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+              <p className="text-[11px] uppercase tracking-wide text-neutral-500 ">
                 {dateLabel}
               </p>
-              <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-neutral-900 dark:text-neutral-100">
+              <h1 className="mt-0.5 text-xl font-semibold tracking-tight text-neutral-900 ">
                 Your Focus
               </h1>
             </div>

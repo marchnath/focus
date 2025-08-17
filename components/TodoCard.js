@@ -59,11 +59,11 @@ export default function TodoCard() {
             <p>No todos yet</p>
           </div>
         ) : (
-          <div className="space-y-2 h-full">
+          <div className="h-full divide-y divide-gray-200/70">
             {previewTodos.map((todo, index) => (
               <motion.div
                 key={todo.id}
-                className="text-sm text-gray-800 flex items-start gap-2"
+                className="text-sm text-gray-800 flex items-start gap-2 py-1.5"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.08 }}
